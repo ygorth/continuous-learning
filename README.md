@@ -12,6 +12,10 @@ Chef is a configuration management and automation platform. Chef helps you descr
 
 Logs: [./configuration-management/chef](https://github.com/ygorth/continuous-learning/tree/master/configuration-management/chef)
 
-### Kubernetes | Docker
+### Docker | Kubernetes
 
+Docker is an open platform for developers and sysadmins to build, ship, and run distributed applications, whether on laptops, data center VMs, or the cloud.
 
+Kubernetes is an open-source system for automating deployment, scaling, and management of containerized applications. It groups containers that make up an application into logical units for easy management and discovery.
+
+Logs: [./configuration-management/containerization](https://github.com/ygorth/continuous-learning/tree/master/containerization)
