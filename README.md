@@ -12,6 +12,6 @@ Chef is a configuration management and automation platform. Chef helps you descr
 
 Logs: [./configuration-management/chef](https://github.com/ygorth/continuous-learning/tree/master/configuration-management/chef)
 
-### Containerization
+### Kubernetes | Docker
 
 
