@@ -4,5 +4,7 @@ On a personal level, continuous learning is about the constant expansion of skil
 
 ## DevOps
 
+DevOps is the combination of cultural philosophies, practices, and tools that increases an organization's ability to deliver applications and services.
+
 ### Chef
 
