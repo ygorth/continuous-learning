@@ -8,3 +8,4 @@ DevOps is the combination of cultural philosophies, practices, and tools that in
 
 ### Chef
 
+Chef is a configuration management and automation platform. Chef helps you describe your infrastructure with code (IaC). Because your infrastructure is managed with code, it is flexible, versionable, and human-readable. Also, it can be automated, tested and reproduced with ease.
