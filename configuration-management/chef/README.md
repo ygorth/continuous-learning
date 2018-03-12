@@ -1,4 +1,4 @@
-## Learning Chef
+## Chef
 
 ### Infrastructure Automation
 Track: https://learn.chef.io/tracks/infrastructure-automation/
