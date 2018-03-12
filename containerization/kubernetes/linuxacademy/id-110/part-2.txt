@@ -1,0 +1,18 @@
+## Containers
+# DB Server
+# Add a name to avoid random names
+$ docker run --name=test1-mysql --env="MYSQL_ROOT_PASSWORD=mypassword" mysql
+$ docker stop test1-mysql
+$ docker logs test1-mysql
+
+$ docker run --detach --name=test1-mysql --env="MYSQL_ROOT_PASSWORD=mypassword" mysql # detach mode
+$ docker inspect test1-mysql # get container IP address
+$ mysql -h 172.17.0.2 -p
+
+# MySQL + WordPress
+$ docker run -d --name mysql -e MYSQL_ROOT_PASSWORD=newpassword mysql
+$ docker pull mysql
+$ docker pull wordpress
+$ docker run -d --name mysql -e MYSQL_ROOT_PASSWORD=newpassword mysql
+$ docker run --name wordpress --link mysql:mysql -d wordpress
+$ elinks 172.17.0.3

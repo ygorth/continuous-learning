@@ -1,0 +1,75 @@
+# ON ALL THE NODES (centos-master - centos-minion1 - centos-minion2)
+$ yum install ntp
+$ systemctl enable ntpd && systemctl restart ntpd && systemctl status ntpd
+
+$ vim /etc/yum.repos.d/virt7-docker-common-release.repo
+[virt7-docker-common-release]
+name=virt7-docker-common-release
+baseurl=http://cbs.centos.org/repos/virt7-docker-common-release/x86_64/os/
+gpgcheck=0
+
+$ yum install etcd kubernetes docker
+
+# ON centos-master
+$ vim /etc/kubernetes/config
+...
+KUBE_MASTER="--master=http://centos-master:8080"
+KUBE_ETCD_SERVER="--etcd-servers=http://centos-master:2370"
+
+$ vim /etc/etcd/etcd.conf
+ETCD_LISTEN_CLIENT_URLS="http://0.0.0.0:2379"
+ETCD_ADVERTISE_CLIENT_URLS="http://0.0.0.0:2379"
+...
+
+$ vim /etc/kubernetes/apiserver
+...
+KUBE_API_ADDRESS="--address=0.0.0.0"
+
+# The port on the local server to listen on.
+KUBE_API_PORT="--port=8080"
+
+# Port minions listen on
+KUBELET_PORT="--kubelet-port=10250"
+
+# Comma separated list of nodes in the etcd cluster
+KUBE_ETCD_SERVERS="--etcd-servers=http://127.0.0.1:2379"
+
+# Address range to use for services
+KUBE_SERVICE_ADDRESSES="--service-cluster-ip-range=10.254.0.0/16"
+
+# default admission control policies
+#KUBE_ADMISSION_CONTROL="--admission-control=NamespaceLifecycle,NamespaceExists,LimitRanger,SecurityContextDeny,ServiceAccount,ResourceQuota"
+
+# Add your own!
+KUBE_API_ARGS=""
+
+# ON centos-minion1 and centos-minion2
+$ systemctl enable etcd kube-apiserver kube-controller-manager kube-scheduler && systemctl restart etcd kube-apiserver kube-controller-manager kube-scheduler && systemctl status etcd kube-apiserver kube-controller-manager kube-scheduler
+$ vim /etc/kubernetes/kubelet
+# The address for the info server to serve on (set to 0.0.0.0 or "" for all interfaces)
+KUBELET_ADDRESS="--address=0.0.0.0"
+
+# The port for the info server to serve on
+KUBELET_PORT="--port=10250"
+
+# You may leave this blank to use the actual hostname
+KUBELET_HOSTNAME="--hostname-override=centos-minion1"
+
+# location of the api-server
+KUBELET_API_SERVER="--api-servers=http://centos-master:8080"
+
+# pod infrastructure container
+#KUBELET_POD_INFRA_CONTAINER="--pod-infra-container-image=registry.access.redhat.com/rhel7/pod-infrastructure:latest"
+
+$ vim /etc/kubernetes/config
+# How the controller-manager, scheduler, and proxy find the apiserver
+KUBE_MASTER="--master=http://centos-master:8080"
+KUBE_ETCD_SERVER="--etcd-servers=http://centos-master:2379"
+
+$ systemctl enable kube-proxy kubelet docker && systemctl restart kube-proxy kubelet docker && systemctl status kube-proxy kubelet docker
+
+# ON centos-master
+$ kubectl get nodes
+NAME             STATUS    AGE
+centos-minion1   Ready     54s
+centos-minion2   Ready     43s
