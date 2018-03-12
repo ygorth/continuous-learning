@@ -14,10 +14,4 @@ Logs: [./configuration-management/chef](https://github.com/ygorth/continuous-lea
 
 ### Containerization
 
-Containers come with many very attractive benefits. Some of the most benefits are listed below:
 
-1. Abstraction of the host system away from the containerized application
-2. Easy Scalability
-3. Extremely lightweight, isolated execution environments
-4. Shared Layering
-5. Composability and Predictability
