@@ -1,6 +1,5 @@
-### Running Containers Locally
+# Running Containers Locally
 ## Link Containers
-# That will show up on the container hosts file
 $ docker run -d --name test1-mysql -e="MYSQL_ROOT_PASSWORD=password" mysql
 $ docker run -d --name test1-wordpress --link test1-mysql:mysql -e="WORDPRESS_DB_PASSWORD=password" -e="WORDPRESS_DB_USER=root" wordpress
 $ docker exec -it test1-wordpress bash
@@ -10,7 +9,7 @@ root@40822e770c7d:/var/www/html# cat /etc/hosts
 172.17.0.2	mysql 7901acd7c0a1 test1-mysql <==== LINK!!!
 172.17.0.3	40822e770c7d
 
-# Checking container variables
+## Checking container variables
 $ docker run -d --name test1-mysql -e="MYSQL_ROOT_PASSWORD=password" mysql
 $ docker run -d --name test1-wordpress --link test1-mysql:sharedinfo -e="WORDPRESS_DB_PASSWORD=password" -e="WORDPRESS_DB_USER=root" wordpress
 $ docker exec -it test1-wordpress bash
@@ -25,4 +24,78 @@ $ docker logs -f test1-wordpress
 $ docker logs --tail 5 test1-wordpress
 
 ## Docker events
-$ 
+$ docker events --since '2018-01-01'
+...
+2018-03-12T17:11:35.942532708Z volume unmount 0c9b2e0e5e72660fdc759f2b8971b21003f72a2bcb087e4f2396836f594cfc06 (container=ae0e32c0dfee3142bd88f105cd1a6808a9ec11f27c51915e4333d65be61cc80e, driver=local)
+2018-03-12T17:11:35.948508703Z container stop ae0e32c0dfee3142bd88f105cd1a6808a9ec11f27c51915e4333d65be61cc80e (image=wordpress, name=test1-wordpress)
+
+## Docker Inspect
+$ docker inspect -f '{{json .NetworkSettings.Ports}}' test1-mysql
+{"3306/tcp":null} 
+
+## Expose Containers
+$ docker run -d --name test1-mysql -e="MYSQL_ROOT_PASSWORD=password" --publish 6603:3306 mysql
+$ docker ps
+CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS                    NAMES
+081d5982875b        mysql               "docker-entrypoint.sh"   27 seconds ago      Up 26 seconds       0.0.0.0:6603->3306/tcp   test1-mysql
+
+$ mysql -h 127.0.0.1 -p -P6603
+Welcome to the MariaDB monitor....
+
+## Share Data Between Containers
+
+$ docker volume create --name sharedvol1
+$ docker volume ls | grep sharedvol1
+$ docker run -ti -v sharedvol1:/sharedvol1 ubuntu
+$$ df -h
+...
+/dev/xvda1                                                                                           20G  9.3G   11G  47% /sharedvol1
+...
+$$ touch /sharedvol1/test1 && echo "test - container" > /sharedvol1/test1
+$$ exit
+$ docker volume inspect sharedvol1
+[
+    {
+        "Name": "sharedvol1",
+        "Driver": "local",
+        "Mountpoint": "/var/lib/docker/volumes/sharedvol1/_data",
+        "Labels": {},
+        "Scope": "local"
+    }
+]
+
+$ cat /var/lib/docker/volumes/sharedvol1/_data/test1
+$ echo "test - localhost" >> /var/lib/docker/volumes/sharedvol1/_data/test1
+$ docker run -ti -v sharedvol1:/sharedvol1 ubuntu
+$$ cat /sharedvol1/test1
+$ exit
+
+$ docker volume create --name newvol1
+$ docker run -ti -v newvol1:/newvol1 ubuntu
+$ docker ps
+CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS              PORTS               NAMES
+f97e8be2cd03        ubuntu              "/bin/bash"         3 seconds ago       Up 3 seconds                            awesome_ptolemy
+
+$ docker run -ti --volumes-from awesome_ptolemy ubuntu
+$$(container2) touch /newvol1/test1 && echo "test - container" > /newvol1/test1
+$$(container1) cat /newvol1/test1
+
+## Host and Container Basic Security Best Practices
+### Limit number of active processes
+$ docker run --pids-limit=64
+### Control new processes (kernel 3.5 +)
+$ docker run --security-opt=no-new-privileges
+### Turn off IPC
+$ docker run --ipc=false
+### Docker read-only
+$ docker run --read-only
+$ docker run -v $(pwd)/secrets:/secrets:ro debian
+### User had to pull image
+$ docker pull debian@sha256:d90u2131j0...
+### Limit memory and CPU sharing
+$ docker -c 512 -mem 512m
+### Define and run a user in your Dockerfile (so no root)
+RUN groupadd -r user && useradd -r -g user user
+
+## Kubernetes
+$ kubectl run wordpress --image=wordpress --port=80 --hostport=81
