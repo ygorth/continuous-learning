@@ -99,3 +99,21 @@ RUN groupadd -r user && useradd -r -g user user
 
 ## Kubernetes
 $ kubectl run wordpress --image=wordpress --port=80 --hostport=81
+$ kubectl describe pod wordpress | less
+$ kubectl get pods
+$ kubectl delete pods wordpress-3905535822-9lfjr   ===> respawn anyways
+$ kubectl delete deployment wordpress   ====> 'deleted' for good
+$ kubectl get pods
+
+### YAML
+
+$ kubectl create -f resources/mynginx.yaml
+$ kubectl get pods
+$ kubectl exec mynginx date
+Fri Mar 23 16:01:40 UTC 2018
+$ kubectl exec mynginx -i -t -- /bin/bash
+$$ apt-get install lynx
+$$ export TERM=xterm
+$$ lynx http://localhost
+$$ exit
+$ kubectl delete -f resources/mynginx.yaml
