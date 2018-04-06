@@ -1,1 +1,45 @@
 # Images
+$ docker pull centos
+$ docker run -d -p 5000:5000 --restart=always --name registry registry:2
+$ docker tag ubuntu localhost:5000/ubuntu
+$ docker push localhost:5000/ubuntu
+$ docker pull localhost:5000/ubuntu
+$ docker stop registry
+
+## Best Practices
+- Use .dockerignore;
+- Containers should be ephemeral;
+- Never install unnecessary packages;
+- Each container for a single purpose (use docker container network to communicate);
+- Minimize no of layers;
+- Build cache (for no cache use: --no-cache=true)
+
+## Working with Images
+- FROM: 
+    - Define the base image to start the build process.
+- RUN: 
+    - It takes a command as its argument and runs during the build of the docker file
+- ADD:
+    - Gets two arguments: source and destination
+    - Copy files from source onto the containers file system
+    - Accepts as a source: URL, file, folder, and a recognized archive type
+- COPY:
+    - Similar to the ADD
+    - Use COPY instruction individually so that each build starts cache is only invalidated if those files change
+    - COPY vs ADD:
+        - ADD allows tar files and URLs
+        - Docker prefer you use COPY because it's more transparent than ADD
+        - Best use for ADD is local tar file extraction: ADD file.tar.gz /.
+- WORKDIR and USER:
+    - WORKDIR directive is used to set where the command defined with CMD should be executed. It's the working directory
+    - USER directive is used to set the UID or username which is to run the container based on the image being built.
+- CMD:
+    - Similar to RUN
+    - Executed when the container is instantiated
+    - Should be considered as an initial default command that gets run when the container is created from the image
+    - Considered as a default and replaces any command which is passed during the creation
+- ENTRYPOINT:
+    - Sets the default application used every time a container is created using the image
+    - If you have a specific application per container use the ENTRYPOINT to start the application when the container runs
+    - CMD vs ENTRYPOINT:
+        - 
